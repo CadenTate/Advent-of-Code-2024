@@ -34,44 +34,75 @@ class Map:
     def moveGuardUp(self):
         guardIndex = self.getGuardLoc()
         guardCoords = self.indexToCordinates(guardIndex)
-        if self.getTile(guardCoords[0], guardCoords[1]-1) == "#":
-            self.map[guardIndex] = ">"
-        else:
-            self.map[self.coordinateToIndex(guardCoords[0], guardCoords[1]-1)] = "^"
+        newGuardCoords = guardCoords[0], guardCoords[1]-1
+        newGuardIndex = self.coordinateToIndex(newGuardCoords[0], newGuardCoords[1])
+
+        try:
+            if self.getTile(newGuardCoords[0], newGuardCoords[1]) == "#":
+                self.map[guardIndex] = ">"
+            else:
+                self.map[guardIndex] = "X"
+                if self.isValid(newGuardIndex):
+                    self.map[newGuardIndex] = "^"
+        except:
             self.map[guardIndex] = "X"
+            return False
+        return True
+
 
     def moveGuardDown(self):
         guardIndex = self.getGuardLoc()
         guardCoords = self.indexToCordinates(guardIndex)
-        newGuardCoords = self.coordinateToIndex(guardCoords[0], guardCoords[1] + 1)
+        newGuardCoords = guardCoords[0], guardCoords[1] + 1
+        newGuardIndex = self.coordinateToIndex(newGuardCoords[0], newGuardCoords[1])
 
-        if self.getTile(newGuardCoords) == "#":
-            self.map[guardIndex] = "<"
-        else:
-            self.map[guardIndex] = "X"
-            if self.isValid(self.coordinateToIndex(newGuardCoords)):
-                self.map[newGuardCoords] = "v"
+        try:
+            if self.getTile(newGuardCoords[0], newGuardCoords[1]) == "#":
+                self.map[guardIndex] = "<"
             else:
-                return False
+                self.map[guardIndex] = "X"
+                self.map[newGuardIndex] = "v"
+        except IndexError:
+            self.map[guardIndex] = "X"
+            return False
+        return True
 
 
     def moveGuardLeft(self):
         guardIndex = self.getGuardLoc()
         guardCoords = self.indexToCordinates(guardIndex)
-        if self.getTile(guardCoords[0]-1, guardCoords[1]) == "#":
-            self.map[guardIndex] = "^"
-        else:
-            self.map[self.coordinateToIndex(guardCoords[0]-1, guardCoords[1])] = "<"
+        newGuardCoords = guardCoords[0] - 1, guardCoords[1]
+        newGuardIndex = self.coordinateToIndex(newGuardCoords[0], newGuardCoords[1])
+
+        try:
+            if self.getTile(newGuardCoords[0], newGuardCoords[1]) == "#":
+                self.map[guardIndex] = "^"
+            else:
+                self.map[guardIndex] = "X"
+                if self.isValid(newGuardIndex):
+                    self.map[newGuardIndex] = "<"
+        except:
             self.map[guardIndex] = "X"
+            return False
+        return True
 
     def moveGuardRight(self):
         guardIndex = self.getGuardLoc()
         guardCoords = self.indexToCordinates(guardIndex)
-        if self.getTile(guardCoords[0]+1, guardCoords[1]) == "#":
-            self.map[guardIndex] = "v"
-        else:
-            self.map[self.coordinateToIndex(guardCoords[0]+1, guardCoords[1])] = ">"
+        newGuardCoords = guardCoords[0] + 1, guardCoords[1]
+        newGuardIndex = self.coordinateToIndex(newGuardCoords[0], newGuardCoords[1])
+
+        try:
+            if self.getTile(newGuardCoords[0], newGuardCoords[1]) == "#":
+                self.map[guardIndex] = "v"
+            else:
+                self.map[guardIndex] = "X"
+                if self.isValid(newGuardIndex):
+                    self.map[newGuardIndex] = ">"
+        except:
             self.map[guardIndex] = "X"
+            return False
+        return True
 
     def printMap(self):
         for i, char in enumerate(self.map):
@@ -90,8 +121,8 @@ with open(path) as file:
 
 isInMap = True
 while isInMap:
-    inputMap.printMap()
-    input()
+    # inputMap.printMap()
+    # input()
     match inputMap.getGuardDirection():
         case "^":
             isInMap = inputMap.moveGuardUp()
@@ -101,6 +132,9 @@ while isInMap:
             isInMap = inputMap.moveGuardLeft()
         case ">":
             isInMap = inputMap.moveGuardRight()
+
+inputMap.printMap()
+print(inputMap.map.count("X"))
 
 
 
