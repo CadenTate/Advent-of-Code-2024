@@ -1,45 +1,73 @@
-import math
+import time
+
+from MapV2 import Map
 
 path = r"input.txt"
 
 with open(path) as file:
-    lines = file.readlines()
+    inputMap = Map(file.readlines())
 
-    # Data Clean Up
-    orderKey = {}
-    for i in lines[:lines.index("\n")]:
-        i = i.strip().split("|")
-        if int(i[0]) in orderKey.keys():
-            orderList = orderKey[int(i[0])]
-            orderList.append(int(i[1]))
-            orderKey[int(i[0])] = orderList
-        else:
-            orderKey[int(i[0])] = [int(i[1])]
-    data = []
-    for i in lines[lines.index("\n") + 1:]:
-        i = i.strip().split(",")
-        data.append([int(num) for num in i])
+# Set initial path
+isInMap = True
+packet = []
 
-    # Logic
-    validSum = 0
-    invalidSum = 0
+guardStartIndex = inputMap.getGuardLoc()
+guardStartRotation = inputMap.getGuardRotation()
+while isInMap:
+    # print(inputMap)
+    # input()
+    match inputMap.getGuardRotation():
+        case "^":
+            packet = inputMap.moveGuardUp()
+        case "v":
+            packet = inputMap.moveGuardDown()
+        case "<":
+            packet = inputMap.moveGuardLeft()
+        case ">":
+            packet = inputMap.moveGuardRight()
 
-    for line in data:
-        isValid = True
-        for num in line:
-            if num in orderKey:
-                for order in orderKey[num]:
-                    if order in line and line.index(num) > line.index(order):
-                        # Correction of line
-                        line.pop(line.index(num))
-                        line.insert(line.index(order), num)
-                        isValid = False
-        if isValid: validSum += line[math.floor(len(line) / 2)]
-        else: invalidSum += line[math.floor(len(line) / 2)]
+    isInMap = packet[0]
+inputMap.map[guardStartIndex] = guardStartRotation
+walkedIndex = inputMap.walkedIndexes.copy()
+print("SET UP DONE")
+# inputMap.printWithWalked()
+
+total = 0
+iterations = 0
+
+for f in walkedIndex:
+    inputMap.resetGuardLocation()
+    hitSpots = []
+    startTime = time.time()
+    # Map Setup
+    inputMap.barrierIndex = f
+
+    isInMap = True
+    packet = []
+
+    while isInMap:
+        match inputMap.getGuardRotation():
+            case "^":
+                packet = inputMap.moveGuardUp()
+            case "v":
+                packet = inputMap.moveGuardDown()
+            case "<":
+                packet = inputMap.moveGuardLeft()
+            case ">":
+                packet = inputMap.moveGuardRight()
+        isInMap = packet[0]
+
+        if len(packet) > 1:
+            if packet[1] in hitSpots:
+                total += 1
+                # print(Coordinate.indexToCoordinates(f, inputMap.width))
+                break
+            else:
+                hitSpots.append(packet[1])
 
 
-    print(validSum)
-    print(invalidSum)
+    iterations += 1
+    print(f"COMPLETION PERCENT: {round(iterations/len(walkedIndex) * 100,2)}%")
+    # print("TIME TAKEN:",time.time()-startTime)
 
-
-
+print(total)
