@@ -9,8 +9,10 @@ class Coordinate:
         return self.y
 
     @staticmethod
-    def coordinateToIndex(coordinate:"Coordinate", height:int) -> int:
-        return coordinate.getY() * height + coordinate.getX()
+    def coordinateToIndex(coordinate:"Coordinate", width:int) -> int:
+        if coordinate.getX() > width-1:
+            return -1
+        return coordinate.getY() * width + coordinate.getX()
 
     @staticmethod
     def indexToCoordinates(index:int, width:int) -> "Coordinate":
